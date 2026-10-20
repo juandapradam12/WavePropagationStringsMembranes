@@ -1,0 +1,42 @@
+{
+  "string": {
+    "length_m": 0.64,
+    "wave_speed_m_s": 250.0,
+    "dx_m": 0.005,
+    "dt_s": 1e-05,
+    "courant": 0.5,
+    "n_time": 513,
+    "fundamental_period_s": 0.00512,
+    "estimated_period_s": 0.00512,
+    "period_relative_error": 0.0,
+    "energy_drift": 0.0026574683235867447,
+    "cfl": {
+      "dimension": 1.0,
+      "courant": 0.5,
+      "courant_limit": 1.0,
+      "margin": 0.5,
+      "energy_drift": 0.0026574683235867447
+    }
+  },
+  "membrane": {
+    "length_m": 0.5,
+    "wave_speed_m_s": 250.0,
+    "dx_m": 0.005,
+    "dt_s": 8e-06,
+    "courant": 0.4,
+    "n_time": 178,
+    "mode_11_period_s": 0.00282842712474619,
+    "energy_drift": 0.010483614536687735,
+    "cfl": {
+      "dimension": 2.0,
+      "courant": 0.4,
+      "courant_limit": 0.7071067811865475,
+      "margin": 0.30710678118654744,
+      "energy_drift": 0.010483614536687735
+    }
+  },
+  "driven_string": {
+    "energy_drift": 0.9558829505134655,
+    "final_over_initial_energy": 1.9558829505134654
+  }
+}
