@@ -14,6 +14,7 @@ from wavefd.analysis.membrane_exact import compare_membrane_mode
 from wavefd.analysis.membrane_modes import membrane_modal_spectrum
 from wavefd.solvers.membrane_2d import MembraneSolution
 from wavefd.solvers.string_1d import StringSolution
+from wavefd.viz.animations import animate_membrane_gif
 from wavefd.viz.style import PALETTE, apply_style
 
 
@@ -50,6 +51,11 @@ def generate_extension_figures(
         "damping": _fig_damping(string_fixed, string_damped, out),
         "free_end": _fig_free_end(string_free, out),
         "free_membrane": _fig_free_membrane(membrane_strike, membrane_free, out),
+        "free_membrane_gif": animate_membrane_gif(
+            membrane_free,
+            out / "free_membrane_evolution.gif",
+            label="Free membrane",
+        ),
         "free_membrane_exact": _fig_free_membrane_exact(membrane_free_mode, free_cmp, out),
     }
     summary = {

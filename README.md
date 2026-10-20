@@ -359,6 +359,13 @@ allowed to move, and reflections do not force a node at the boundary.
 ($\partial_n u=0$) edges. At half a $(1,1)$ period the free rim has
 already left the plane $u=0$.
 
+<p align="center">
+  <img src="figures/free_membrane_evolution.gif" width="480" alt="Animated free membrane evolution"/>
+</p>
+
+**Figure 19b.** Temporal evolution of the free membrane: the wavefront
+reaches the rim and reflects without pinning $u$ to zero on the boundary.
+
 Free rectangular modes are cosines,
 $A\cos(\omega_{mn}t)\cos(m\pi x/L)\cos(n\pi y/L)$ with $m,n\ge 0$. A pure
 $(1,0)$ field checks the Neumann leapfrog against that closed form:

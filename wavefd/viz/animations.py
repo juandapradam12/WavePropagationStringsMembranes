@@ -82,11 +82,17 @@ def animate_membrane_gif(
     *,
     n_frames: int = 50,
     fps: int = 10,
+    label: str | None = None,
 ) -> Path:
-    """GIF of the clamped membrane displacement field."""
+    """GIF of a membrane displacement field (clamped or free)."""
     apply_style()
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if label is None:
+        boundary = getattr(sol, "boundary", None)
+        name = getattr(boundary, "value", None) or "clamped"
+        label = f"{name.capitalize()} membrane"
 
     idxs = _frame_indices(sol.t.size, n_frames)
     vmax = float(np.max(np.abs(sol.u))) or 1.0
@@ -115,7 +121,7 @@ def animate_membrane_gif(
         i = int(idxs[frame])
         im.set_data(sol.u[i])
         title.set_text(
-            rf"Clamped membrane — $t={sol.t[i]*1e3:.2f}$ ms "
+            rf"{label} — $t={sol.t[i]*1e3:.2f}$ ms "
             rf"($t/T_{{11}}={sol.t[i]/T11:.2f}$)"
         )
         return im, title
