@@ -27,6 +27,8 @@ def generate_extension_figures(
     *,
     membrane_mode_sol: MembraneSolution,
     membrane_strike: MembraneSolution,
+    membrane_free: MembraneSolution,
+    membrane_free_mode: MembraneSolution,
     cfl_demo: CFLDemoResult,
     string_damped: StringSolution,
     string_free: StringSolution,
@@ -38,6 +40,7 @@ def generate_extension_figures(
     out.mkdir(parents=True, exist_ok=True)
 
     mem_cmp = compare_membrane_mode(membrane_mode_sol, m=1, n=1)
+    free_cmp = compare_membrane_mode(membrane_free_mode, m=1, n=0, free=True)
     mem_modes = membrane_modal_spectrum(membrane_strike, n_modes=6)
 
     paths = {
@@ -46,11 +49,19 @@ def generate_extension_figures(
         "membrane_modes": _fig_membrane_modes(mem_modes, out),
         "damping": _fig_damping(string_fixed, string_damped, out),
         "free_end": _fig_free_end(string_free, out),
+        "free_membrane": _fig_free_membrane(membrane_strike, membrane_free, out),
+        "free_membrane_exact": _fig_free_membrane_exact(membrane_free_mode, free_cmp, out),
     }
     summary = {
         "membrane_mode": {
             "max_rel_l2": mem_cmp["max_rel_l2"],
             "final_rel_l2": mem_cmp["final_rel_l2"],
+        },
+        "free_membrane_mode": {
+            "max_rel_l2": free_cmp["max_rel_l2"],
+            "final_rel_l2": free_cmp["final_rel_l2"],
+            "m": 1,
+            "n": 0,
         },
         "cfl_demo": {
             "stable_r": float(cfl_demo.stable.r),
@@ -64,6 +75,13 @@ def generate_extension_figures(
         "damping": {
             "gamma": float(string_damped.config.gamma),
             "energy_ratio": float(string_damped.energy[-1] / string_damped.energy[0]),
+        },
+        "free_membrane": {
+            "energy_drift": float(
+                np.max(np.abs(membrane_free.energy - membrane_free.energy[0]))
+                / abs(membrane_free.energy[0])
+            ),
+            "edge_rms_final": float(np.sqrt(np.mean(membrane_free.u[-1, 0, :] ** 2))),
         },
     }
     return paths, summary
@@ -268,3 +286,74 @@ def _fig_free_end(sol: StringSolution, out: Path) -> Path:
     fig.colorbar(im, cax=cax, label=r"$u$ [m]")
     fig.tight_layout()
     return _save(fig, out / "17_free_end.png")
+
+
+def _fig_free_membrane(
+    clamped: MembraneSolution,
+    free: MembraneSolution,
+    out: Path,
+) -> Path:
+    """Compare the same strike under clamped vs free edges."""
+    T11 = clamped.config.fundamental_period()
+    frac = 0.5
+    idx_c = int(np.argmin(np.abs(clamped.t - frac * T11)))
+    idx_f = int(np.argmin(np.abs(free.t - frac * T11)))
+    vmax = max(np.max(np.abs(clamped.u[idx_c])), np.max(np.abs(free.u[idx_f])), 1e-12)
+    extent = [clamped.x[0], clamped.x[-1], clamped.y[0], clamped.y[-1]]
+
+    fig, axes = plt.subplots(2, 2, figsize=(9.0, 8.2))
+    for ax, field, title in [
+        (axes[0, 0], clamped.u[0], r"Clamped — $t=0$"),
+        (axes[0, 1], free.u[0], r"Free — $t=0$"),
+        (axes[1, 0], clamped.u[idx_c], rf"Clamped — $t/T_{{11}}={frac:.2f}$"),
+        (axes[1, 1], free.u[idx_f], rf"Free — $t/T_{{11}}={frac:.2f}$"),
+    ]:
+        im = ax.imshow(
+            field,
+            origin="lower",
+            extent=extent,
+            cmap="RdBu_r",
+            vmin=-vmax,
+            vmax=vmax,
+            aspect="equal",
+        )
+        ax.set_title(title)
+        ax.set_xlabel(r"$x$ [m]")
+        ax.set_ylabel(r"$y$ [m]")
+
+    fig.suptitle(
+        r"Same strike: Dirichlet $u=0$ pins the rim; Neumann $\partial_n u=0$ lets it move",
+        fontsize=12,
+        y=1.01,
+    )
+    fig.subplots_adjust(right=0.88, wspace=0.28, hspace=0.32)
+    cax = fig.add_axes([0.90, 0.18, 0.025, 0.64])
+    fig.colorbar(im, cax=cax, label=r"$u$ [m]")
+    return _save(fig, out / "18_free_membrane.png")
+
+
+def _fig_free_membrane_exact(sol: MembraneSolution, cmp: dict, out: Path) -> Path:
+    fig, axes = plt.subplots(1, 2, figsize=(10.5, 3.8))
+    # Probe an off-center point that moves for the (1,0) cosine mode
+    iy, ix = sol.u.shape[1] // 2, sol.u.shape[2] // 4
+    t_ms = sol.t * 1e3
+    axes[0].plot(t_ms, sol.u[:, iy, ix] * 1e3, color=PALETTE["accent"], lw=2.0, label="numerical")
+    axes[0].plot(
+        t_ms,
+        cmp["exact"][:, iy, ix] * 1e3,
+        "--",
+        color=PALETTE["warm"],
+        lw=1.6,
+        label=r"exact free $(1,0)$",
+    )
+    axes[0].set_xlabel(r"$t$ [ms]")
+    axes[0].set_ylabel(r"$u$ [mm]")
+    axes[0].set_title(r"Free membrane: leapfrog vs $\cos(\pi x/L)$ mode")
+    axes[0].legend(fontsize=9)
+
+    axes[1].semilogy(t_ms, cmp["rel_l2"], color=PALETTE["cool"], lw=2.0)
+    axes[1].set_xlabel(r"$t$ [ms]")
+    axes[1].set_ylabel(r"$\|u_{\mathrm{num}}-u_{\mathrm{ex}}\|_2 / \|u_0\|_2$")
+    axes[1].set_title(f"Relative $L^2$ error (max {cmp['max_rel_l2']:.2e})")
+    fig.tight_layout()
+    return _save(fig, out / "19_free_membrane_exact.png")

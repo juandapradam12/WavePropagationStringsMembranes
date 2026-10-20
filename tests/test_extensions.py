@@ -7,7 +7,8 @@ import numpy as np
 from wavefd.analysis.cfl_demo import run_cfl_stability_demo
 from wavefd.analysis.membrane_exact import compare_membrane_mode, exact_membrane_mode
 from wavefd.analysis.membrane_modes import membrane_modal_spectrum
-from wavefd.solvers.membrane_2d import MembraneConfig, MembraneWaveSolver
+from wavefd.analysis.diagnostics import relative_energy_drift
+from wavefd.solvers.membrane_2d import MembraneBoundary, MembraneConfig, MembraneWaveSolver
 from wavefd.solvers.string_1d import BoundaryMode, StringConfig, StringWaveSolver
 
 
@@ -70,3 +71,24 @@ def test_membrane_modal_spectrum_peaked():
     assert np.isclose(np.sum(spec["energy_fraction"]), 1.0, atol=1e-6)
     # Central strike should put most energy in low (m,n)
     assert float(np.max(spec["energy_fraction"])) > 0.2
+
+
+def test_free_membrane_edges_move_and_energy_stable():
+    u0 = np.loadtxt("/workspace/data/membrane_ic.dat")
+    sol = MembraneWaveSolver(
+        u0, MembraneConfig(length=0.5, cfl=0.4, n_periods=0.5)
+    ).solve(MembraneBoundary.FREE)
+    assert np.max(np.abs(sol.u[-1, 0, :])) > 1e-6
+    assert relative_energy_drift(sol.energy) < 5e-2
+
+
+def test_free_membrane_exact_mode():
+    L, n = 0.5, 41
+    xx = np.linspace(0.0, L, n)
+    X, Y = np.meshgrid(xx, xx)
+    u0 = 0.01 * np.cos(np.pi * X / L)  # free (1,0)
+    sol = MembraneWaveSolver(u0, MembraneConfig(length=L, cfl=0.4, n_periods=1.0)).solve(
+        MembraneBoundary.FREE
+    )
+    cmp = compare_membrane_mode(sol, m=1, n=0, free=True)
+    assert cmp["max_rel_l2"] < 5e-2

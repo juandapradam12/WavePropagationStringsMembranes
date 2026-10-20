@@ -17,11 +17,23 @@ def exact_membrane_mode(
     m: int = 1,
     n: int = 1,
     amplitude: float = 0.01,
+    free: bool = False,
 ) -> np.ndarray:
-    """Exact clamped mode :math:`A\\cos(\\omega_{mn}t)\\sin(m\\pi x/L)\\sin(n\\pi y/L)`."""
+    """Exact rectangular membrane mode.
+
+    Clamped (Dirichlet): :math:`A\\cos(\\omega t)\\sin(m\\pi x/L)\\sin(n\\pi y/L)`,
+    :math:`m,n\\ge 1`.
+
+    Free (Neumann): :math:`A\\cos(\\omega t)\\cos(m\\pi x/L)\\cos(n\\pi y/L)`,
+    :math:`m,n\\ge 0`.
+    """
     omega = np.pi * c * np.sqrt((m / length) ** 2 + (n / length) ** 2)
-    sx = np.sin(m * np.pi * x / length)
-    sy = np.sin(n * np.pi * y / length)
+    if free:
+        sx = np.cos(m * np.pi * x / length)
+        sy = np.cos(n * np.pi * y / length)
+    else:
+        sx = np.sin(m * np.pi * x / length)
+        sy = np.sin(n * np.pi * y / length)
     spatial = amplitude * sy[:, None] * sx[None, :]
     return np.cos(omega * t)[:, None, None] * spatial[None, :, :]
 
@@ -40,7 +52,13 @@ def relative_l2_membrane(
     return err / denom
 
 
-def compare_membrane_mode(sol: MembraneSolution, m: int = 1, n: int = 1) -> dict:
+def compare_membrane_mode(
+    sol: MembraneSolution,
+    m: int = 1,
+    n: int = 1,
+    *,
+    free: bool = False,
+) -> dict:
     """Compare a membrane run to the analytic rectangular mode matching its IC peak."""
     amp = float(np.max(np.abs(sol.u[0])))
     exact = exact_membrane_mode(
@@ -52,6 +70,7 @@ def compare_membrane_mode(sol: MembraneSolution, m: int = 1, n: int = 1) -> dict
         m=m,
         n=n,
         amplitude=amp,
+        free=free,
     )
     rel = relative_l2_membrane(sol.u, exact, sol.dx)
     return {
@@ -62,4 +81,5 @@ def compare_membrane_mode(sol: MembraneSolution, m: int = 1, n: int = 1) -> dict
         "m": m,
         "n": n,
         "amplitude": amp,
+        "free": free,
     }

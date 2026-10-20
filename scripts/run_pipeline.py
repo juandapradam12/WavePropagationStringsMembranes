@@ -22,7 +22,7 @@ from wavefd.analysis.diagnostics import (
     standing_wave_period_estimate,
 )
 from wavefd.io import load_membrane_ic, load_string_ic, save_array
-from wavefd.solvers.membrane_2d import MembraneConfig, MembraneWaveSolver
+from wavefd.solvers.membrane_2d import MembraneBoundary, MembraneConfig, MembraneWaveSolver
 from wavefd.solvers.string_1d import BoundaryMode, StringConfig, StringWaveSolver
 from wavefd.viz.extension_figures import generate_extension_figures
 from wavefd.viz.figures import generate_all_figures
@@ -62,14 +62,19 @@ def main() -> None:
     string_driven = StringWaveSolver(x, u0, string_cfg).solve(mode=BoundaryMode.DRIVEN)
     string_free = StringWaveSolver(x, u0, string_cfg).solve(mode=BoundaryMode.FREE)
     string_damped = StringWaveSolver(x, u0, damped_cfg).solve(mode=BoundaryMode.FIXED)
-    membrane = MembraneWaveSolver(membrane_u0, membrane_cfg).solve()
+    membrane = MembraneWaveSolver(membrane_u0, membrane_cfg).solve(MembraneBoundary.CLAMPED)
+    membrane_free = MembraneWaveSolver(membrane_u0, membrane_cfg).solve(MembraneBoundary.FREE)
 
-    # Pure (1,1) membrane mode for exact verification
+    # Pure modes for exact verification (clamped sine vs free cosine)
     L_m = membrane_cfg.length
     xx = np.linspace(0.0, L_m, membrane_u0.shape[0])
     X, Y = np.meshgrid(xx, xx)
     mode_u0 = 0.01 * np.sin(np.pi * X / L_m) * np.sin(np.pi * Y / L_m)
-    membrane_mode = MembraneWaveSolver(mode_u0, membrane_cfg).solve()
+    membrane_mode = MembraneWaveSolver(mode_u0, membrane_cfg).solve(MembraneBoundary.CLAMPED)
+    free_mode_u0 = 0.01 * np.cos(np.pi * X / L_m)  # free (1,0) mode
+    membrane_free_mode = MembraneWaveSolver(free_mode_u0, membrane_cfg).solve(
+        MembraneBoundary.FREE
+    )
 
     cfl_demo = run_cfl_stability_demo()
 
@@ -104,6 +109,8 @@ def main() -> None:
     ext_paths, ext_summary = generate_extension_figures(
         membrane_mode_sol=membrane_mode,
         membrane_strike=membrane,
+        membrane_free=membrane_free,
+        membrane_free_mode=membrane_free_mode,
         cfl_demo=cfl_demo,
         string_damped=string_damped,
         string_free=string_free,

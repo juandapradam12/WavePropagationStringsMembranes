@@ -338,6 +338,39 @@ Compare with Figure 4, where fixed ends invert the wave on reflection.
 
 ---
 
+## Free membrane: Neumann edges
+
+A free drumhead is not a membrane without boundaries. On a finite square
+the free-edge condition is Neumann,
+
+$$
+\partial_n u = 0 \quad\text{on}\quad \partial\Omega,
+$$
+
+implemented with reflected ghost points on all four sides. The same
+central strike then evolves differently from the clamped case: the rim is
+allowed to move, and reflections do not force a node at the boundary.
+
+<p align="center">
+  <img src="figures/18_free_membrane.png" width="760" alt="Clamped vs free membrane strike"/>
+</p>
+
+**Figure 19.** Identical initial strike under clamped ($u=0$) and free
+($\partial_n u=0$) edges. At half a $(1,1)$ period the free rim has
+already left the plane $u=0$.
+
+Free rectangular modes are cosines,
+$A\cos(\omega_{mn}t)\cos(m\pi x/L)\cos(n\pi y/L)$ with $m,n\ge 0$. A pure
+$(1,0)$ field checks the Neumann leapfrog against that closed form:
+
+<p align="center">
+  <img src="figures/19_free_membrane_exact.png" width="900" alt="Free membrane exact mode check"/>
+</p>
+
+**Figure 20.** Free-membrane verification for the $(1,0)$ cosine mode.
+
+---
+
 ## Workflow close-out
 
 Three time series summarize the narrative: the fixed string returns;
@@ -348,7 +381,7 @@ reflected fronts.
   <img src="figures/08_workflow_summary.png" width="920" alt="Summary time series for string and membrane"/>
 </p>
 
-**Figure 19.** End-to-end diagnostics. Left: mid-point of the fixed
+**Figure 21.** End-to-end diagnostics. Left: mid-point of the fixed
 string recovers after $T_1$. Center: an interior probe on the driven
 string shows resonant growth. Right: the membrane center oscillates as
 energy cycles between kinetic and potential form.

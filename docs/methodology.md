@@ -39,12 +39,17 @@ $$
 \qquad (x,y)\in(0,L)^2,\ t>0,
 $$
 
-with $u|_{\partial\Omega}=0$ and vanishing initial velocity. Rectangular
-modes have frequencies
+with either clamped edges $u|_{\partial\Omega}=0$ or free edges
+$\partial_n u|_{\partial\Omega}=0$, and vanishing initial velocity.
+Rectangular frequencies keep the form
 
 $$
-f_{mn} = \frac{c}{2}\sqrt{\Bigl(\frac{m}{L}\Bigr)^2+\Bigl(\frac{n}{L}\Bigr)^2}.
+f_{mn} = \frac{c}{2}\sqrt{\Bigl(\frac{m}{L}\Bigr)^2+\Bigl(\frac{n}{L}\Bigr)^2},
 $$
+
+with sine factors and $m,n\ge 1$ when clamped, and cosine factors and
+$m,n\ge 0$ when free (the rigid mode $(0,0)$ has $f_{00}=0$). Neumann
+conditions are imposed by reflecting ghost points across each edge.
 
 ## Explicit finite-difference schemes
 
