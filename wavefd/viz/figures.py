@@ -16,6 +16,7 @@ from wavefd.analysis.diagnostics import (
 )
 from wavefd.solvers.membrane_2d import MembraneSolution
 from wavefd.solvers.string_1d import StringSolution
+from wavefd.viz.animations import animate_membrane_gif, animate_string_gif
 from wavefd.viz.style import PALETTE, apply_style
 
 
@@ -37,11 +38,13 @@ def generate_all_figures(
     paths["ic_overview"] = _fig_ic_overview(string_x0, string_u0, membrane_u0, membrane, out)
     paths["cfl"] = _fig_cfl(string_fixed, membrane, out)
     paths["string_evolution"] = _fig_string_evolution(string_fixed, out)
+    paths["string_gif"] = animate_string_gif(string_fixed, out / "string_evolution.gif")
     paths["string_spacetime"] = _fig_string_spacetime(string_fixed, out)
     paths["string_energy"] = _fig_energy(string_fixed, "string_energy.png", "Fixed-end string", out)
     paths["string_period"] = _fig_period_check(string_fixed, out)
     paths["driven_evolution"] = _fig_driven(string_driven, out)
     paths["membrane_evolution"] = _fig_membrane_evolution(membrane, out)
+    paths["membrane_gif"] = animate_membrane_gif(membrane, out / "membrane_evolution.gif")
     paths["membrane_energy"] = _fig_energy(membrane, "membrane_energy.png", "Clamped membrane", out)
     paths["workflow"] = _fig_workflow_summary(string_fixed, string_driven, membrane, out)
     return paths
@@ -247,12 +250,13 @@ def _fig_driven(sol: StringSolution, out: Path) -> Path:
 
 
 def _fig_membrane_evolution(sol: MembraneSolution, out: Path) -> Path:
-    fractions = (0.0, 0.25, 0.5, 0.75)
-    idxs = sol.snapshot_indices(fractions)
+    T11 = sol.config.fundamental_period()
+    target_fracs = (0.0, 0.25, 0.5, 0.75)
+    idxs = [int(np.argmin(np.abs(sol.t - f * T11))) for f in target_fracs]
     vmax = np.max(np.abs(sol.u[idxs]))
     fig, axes = plt.subplots(2, 2, figsize=(8.8, 8.0))
     extent = [sol.x[0], sol.x[-1], sol.y[0], sol.y[-1]]
-    for ax, frac, idx in zip(axes.ravel(), fractions, idxs):
+    for ax, frac, idx in zip(axes.ravel(), target_fracs, idxs):
         im = ax.imshow(
             sol.u[idx],
             origin="lower",
@@ -262,7 +266,7 @@ def _fig_membrane_evolution(sol: MembraneSolution, out: Path) -> Path:
             vmax=vmax,
             aspect="equal",
         )
-        ax.set_title(rf"$t/T_{{11}} = {frac:.2f}$")
+        ax.set_title(rf"$t/T_{{11}} = {sol.t[idx]/T11:.2f}$")
         ax.set_xlabel(r"$x$ [m]")
         ax.set_ylabel(r"$y$ [m]")
     fig.suptitle("Circular wavefronts expand, reflect, and interfere on the clamped drumhead", fontsize=12)

@@ -29,7 +29,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--figure-dir", type=Path, default=ROOT / "figures")
     p.add_argument("--results-dir", type=Path, default=ROOT / "results")
     p.add_argument("--string-periods", type=float, default=1.0)
-    p.add_argument("--membrane-periods", type=float, default=0.5)
+    p.add_argument("--membrane-periods", type=float, default=1.0)
     p.add_argument("--cfl-1d", type=float, default=0.5)
     p.add_argument("--cfl-2d", type=float, default=0.4)
     return p.parse_args()

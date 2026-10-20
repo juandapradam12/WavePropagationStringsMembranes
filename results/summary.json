@@ -24,15 +24,15 @@
     "dx_m": 0.005,
     "dt_s": 8e-06,
     "courant": 0.4,
-    "n_time": 178,
+    "n_time": 355,
     "mode_11_period_s": 0.00282842712474619,
-    "energy_drift": 0.010483614536687735,
+    "energy_drift": 0.00493157570743858,
     "cfl": {
       "dimension": 2.0,
       "courant": 0.4,
       "courant_limit": 0.7071067811865475,
       "margin": 0.30710678118654744,
-      "energy_drift": 0.010483614536687735
+      "energy_drift": 0.00493157570743858
     }
   },
   "driven_string": {
