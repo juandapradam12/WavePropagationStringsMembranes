@@ -27,6 +27,7 @@ def apply_style() -> None:
             "axes.labelcolor": PALETTE["ink"],
             "axes.titlecolor": PALETTE["ink"],
             "axes.titlesize": 12,
+            "axes.titlepad": 12,
             "axes.labelsize": 11,
             "xtick.color": PALETTE["muted"],
             "ytick.color": PALETTE["muted"],
@@ -36,6 +37,7 @@ def apply_style() -> None:
             "legend.frameon": False,
             "savefig.dpi": 160,
             "savefig.bbox": "tight",
+            "savefig.pad_inches": 0.25,
             "savefig.facecolor": PALETTE["bg"],
         }
     )

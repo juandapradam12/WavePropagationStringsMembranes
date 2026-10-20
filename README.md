@@ -27,7 +27,7 @@ Wave speed $c=250\,\mathrm{m\,s^{-1}}$ in both cases. For the string the
 fundamental period is exact,
 
 $$
-T_1 = \frac{2L}{c},
+T_1 = \frac{2L}{c}
 $$
 
 while the membrane's lowest rectangular mode has period
@@ -51,7 +51,7 @@ An equispaced grid of spacing $\Delta x$ and time step $\Delta t$ defines
 the Courant number
 
 $$
-r = \frac{c\,\Delta t}{\Delta x}.
+r = \frac{c\,\Delta t}{\Delta x}
 $$
 
 The leapfrog update in one dimension,
@@ -100,7 +100,7 @@ reflect with a sign change and reform the initial profile at $t=T_1$.
 </p>
 
 **Figure 3b.** Discrete snapshots of the same evolution at
-$t/T_1\in\{0,0.25,0.5,0.75,1\}$.
+$t/T_1 = 0$, $0.25$, $0.5$, $0.75$, and $1$.
 
 <p align="center">
   <img src="figures/04_string_spacetime.png" width="820" alt="Space-time diagram of the fixed string"/>
@@ -147,8 +147,7 @@ The same initial pluck is now evolved with the right endpoint prescribed
 as a sinusoid at the fundamental frequency,
 
 $$
-u(L,t)=A\sin\Bigl(\frac{\pi c}{L}\,t\Bigr),
-\qquad u(0,t)=0.
+u(L,t)=A\sin\Bigl(\frac{\pi c}{L}\,t\Bigr), \qquad u(0,t)=0
 $$
 
 The drive resonates with the lowest mode and continuously injects energy
@@ -184,8 +183,8 @@ that expands, reflects from the rim, and interferes with itself.
   <img src="figures/07_membrane_evolution.png" width="720" alt="Membrane displacement at successive fractions of T11"/>
 </p>
 
-**Figure 8b.** Snapshots at $t/T_{11}\in\{0,0.25,0.5,0.75\}$ from the same
-run.
+**Figure 8b.** Snapshots at $t/T_{11} = 0$, $0.25$, $0.5$, and $0.75$ from
+the same run.
 
 <p align="center">
   <img src="figures/membrane_energy.png" width="780" alt="Discrete energy of the membrane"/>
@@ -203,7 +202,7 @@ With vanishing initial velocity the fixed-end problem has the d'Alembert
 representation
 
 $$
-u(x,t)=\frac12\bigl[F(x-ct)+F(x+ct)\bigr],
+u(x,t)=\frac{1}{2}\bigl[F(x-ct)+F(x+ct)\bigr]
 $$
 
 where $F$ is the odd $2L$-periodic extension of the initial pluck. Comparing
@@ -219,8 +218,8 @@ norm) as a function of time.
 
 A pure standing wave $u(x,0)=A\sin(\pi x/L)$ removes the kink and yields a
 clean convergence test. Refining $\Delta x$ at fixed Courant number, the
-leapfrog scheme (formally $\mathcal{O}(\Delta x^2,\Delta t^2)$) shows a
-higher observed rate on this grid eigenmode:
+leapfrog scheme — formally second-order in $\Delta x$ and $\Delta t$ —
+shows a higher observed rate on this grid eigenmode:
 
 <p align="center">
   <img src="figures/10_convergence.png" width="720" alt="Spatial convergence study"/>
@@ -288,8 +287,8 @@ $(m,n)$ pairs carry the energy:
   <img src="figures/15_membrane_modes.png" width="900" alt="Membrane rectangular modal spectrum"/>
 </p>
 
-**Figure 15.** Absolute modal amplitudes $|a_{mn}|$ and energy fractions
-for the centered strike.
+**Figure 15.** Absolute modal amplitudes $\lvert a_{mn}\rvert$ and energy
+fractions for the centered strike.
 
 ---
 
@@ -313,7 +312,7 @@ Linear viscous friction $-\gamma\partial_t u$ turns the conservative string
 into a decaying oscillator,
 
 $$
-\partial_{tt} u = c^2 \partial_{xx} u - \gamma \partial_t u,
+\partial_{tt} u = c^2 \partial_{xx} u - \gamma \partial_t u
 $$
 
 and drains mechanical energy on a controllable timescale:
@@ -344,7 +343,7 @@ A free drumhead is not a membrane without boundaries. On a finite square
 the free-edge condition is Neumann,
 
 $$
-\partial_n u = 0 \quad\text{on}\quad \partial\Omega,
+\partial_n u = 0 \quad \text{on} \quad \partial\Omega
 $$
 
 implemented with reflected ghost points on all four sides. The same
@@ -367,7 +366,7 @@ zero on the boundary.
 ($u=0$) and free ($\partial_n u=0$) edges.
 
 Free rectangular modes are cosines,
-$A\cos(\omega_{mn}t)\cos(m\pi x/L)\cos(n\pi y/L)$ with $m,n\ge 0$. A pure
+$A\cos(\omega_{mn}t)\cos(m\pi x/L)\cos(n\pi y/L)$ with $m\ge 0$, $n\ge 0$. A pure
 $(1,0)$ field checks the Neumann leapfrog against that closed form:
 
 <p align="center">
