@@ -184,8 +184,8 @@ that expands, reflects from the rim, and interferes with itself.
   <img src="figures/07_membrane_evolution.png" width="720" alt="Membrane displacement at successive fractions of T11"/>
 </p>
 
-**Figure 8b.** Snapshots at $t/T_{11}\in\{0,0.25,0.5,0.75\}$ from the same
-run.
+**Figure 8b.** Snapshots at $t/T_{11} = 0$, $0.25$, $0.5$, and $0.75$ from
+the same run.
 
 <p align="center">
   <img src="figures/membrane_energy.png" width="780" alt="Discrete energy of the membrane"/>
