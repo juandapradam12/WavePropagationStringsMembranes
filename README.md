@@ -51,7 +51,7 @@ An equispaced grid of spacing $\Delta x$ and time step $\Delta t$ defines
 the Courant number
 
 $$
-r = \frac{c\,\Delta t}{\Delta x}.
+r = \frac{c\,\Delta t}{\Delta x}
 $$
 
 The leapfrog update in one dimension,
@@ -147,7 +147,7 @@ The same initial pluck is now evolved with the right endpoint prescribed
 as a sinusoid at the fundamental frequency,
 
 $$
-u(L,t)=A\sin\Bigl(\frac{\pi c}{L}\,t\Bigr), \qquad u(0,t)=0.
+u(L,t)=A\sin\Bigl(\frac{\pi c}{L}\,t\Bigr), \qquad u(0,t)=0
 $$
 
 The drive resonates with the lowest mode and continuously injects energy
@@ -202,7 +202,7 @@ With vanishing initial velocity the fixed-end problem has the d'Alembert
 representation
 
 $$
-u(x,t)=\frac12\bigl[F(x-ct)+F(x+ct)\bigr]
+u(x,t)=\frac{1}{2}\bigl[F(x-ct)+F(x+ct)\bigr]
 $$
 
 where $F$ is the odd $2L$-periodic extension of the initial pluck. Comparing
@@ -343,7 +343,7 @@ A free drumhead is not a membrane without boundaries. On a finite square
 the free-edge condition is Neumann,
 
 $$
-\partial_n u = 0 \quad\text{on}\quad \partial\Omega
+\partial_n u = 0 \quad \text{on} \quad \partial\Omega
 $$
 
 implemented with reflected ghost points on all four sides. The same
