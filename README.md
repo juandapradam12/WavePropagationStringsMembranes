@@ -57,11 +57,7 @@ $$
 The leapfrog update in one dimension,
 
 $$
-u^{n+1}_i
-=
-2(1-r^2)\,u^n_i
-- u^{n-1}_i
-+ r^2\bigl(u^n_{i+1}+u^n_{i-1}\bigr),
+u^{n+1}_i = 2(1-r^2)\,u^n_i - u^{n-1}_i + r^2\bigl(u^n_{i+1}+u^n_{i-1}\bigr)
 $$
 
 is stable for $r\le 1$. On the square membrane the five-point stencil
@@ -123,11 +119,7 @@ For a closed system the discrete mechanical energy must stay nearly
 constant. Monitoring
 
 $$
-E^n
-=
-\frac12\sum_i (\partial_t^{\mathrm{stg}} u)^2\Delta x
-+
-\frac{c^2}{2}\sum_i (\partial_x u)^2\Delta x
+E^n = \frac{1}{2}\sum_i (\partial_t^{\mathrm{stg}} u)^2\Delta x + \frac{c^2}{2}\sum_i (\partial_x u)^2\Delta x
 $$
 
 gives a sharp consistency diagnostic:

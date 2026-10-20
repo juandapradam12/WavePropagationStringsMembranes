@@ -58,13 +58,7 @@ Von Neumann analysis yields stability for $r\le 1$.
 ### 2D five-point update
 
 $$
-u^{n+1}_{i,j}
-=
-2\bigl(1-2r^2\bigr)\,u^n_{i,j}
-- u^{n-1}_{i,j}
-+ r^2\bigl(
-u^n_{i+1,j}+u^n_{i-1,j}+u^n_{i,j+1}+u^n_{i,j-1}
-\bigr),
+u^{n+1}_{i,j} = 2\bigl(1-2r^2\bigr)\,u^n_{i,j} - u^{n-1}_{i,j} + r^2\bigl(u^n_{i+1,j}+u^n_{i-1,j}+u^n_{i,j+1}+u^n_{i,j-1}\bigr)
 $$
 
 stable for $r\le 1/\sqrt{2}$.
@@ -74,11 +68,7 @@ stable for $r\le 1/\sqrt{2}$.
 A consistent discrete mechanical energy
 
 $$
-E^n
-=
-\frac12\sum_i\bigl(\partial_t^{\mathrm{stg}} u\bigr)^2\Delta x
-+
-\frac{c^2}{2}\sum_i\bigl(\partial_x u\bigr)^2\Delta x
+E^n = \frac{1}{2}\sum_i\bigl(\partial_t^{\mathrm{stg}} u\bigr)^2\Delta x + \frac{c^2}{2}\sum_i\bigl(\partial_x u\bigr)^2\Delta x
 $$
 
 (and its two-dimensional analogue) is monitored at every time step. For
