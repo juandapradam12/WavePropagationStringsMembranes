@@ -19,6 +19,16 @@ regimes are considered:
 1. **Fixed ends.** $u(0,t)=u(L,t)=0$.
 2. **Driven end.** $u(0,t)=0$ and $u(L,t)=A\sin(\omega_1 t)$ with
    $\omega_1 = \pi c / L$ (the fundamental angular frequency).
+3. **Free end.** $u(0,t)=0$ and $u_x(L,t)=0$ (Neumann), implemented with a
+   ghost point $u_{N+1}=u_{N-1}$.
+
+Optional linear damping $-\gamma\partial_t u$ uses the centered update
+
+$$
+u^{n+1}_i
+=
+\frac{2u^n_i-(1-\gamma\Delta t/2)u^{n-1}_i+r^2\Delta_h u^n_i}{1+\gamma\Delta t/2}.
+$$
 
 The exact fundamental period for fixed ends is $T_1 = 2L/c$.
 
@@ -110,5 +120,9 @@ is implemented under `wavefd/analysis/` and plotted by the pipeline.
 | `wavefd/analysis/modes.py` | Discrete sine projection |
 | `wavefd/analysis/dispersion.py` | Leapfrog dispersion relation |
 | `wavefd/analysis/audio.py` | Mid-point WAV export |
+| `wavefd/analysis/membrane_exact.py` | Exact $(m,n)$ membrane modes |
+| `wavefd/analysis/membrane_modes.py` | Rectangular modal projection |
+| `wavefd/analysis/cfl_demo.py` | Stable vs unstable Courant demo |
 | `wavefd/viz/figures.py` | Figure suite used by the README |
+| `wavefd/viz/extension_figures.py` | Membrane / CFL / damping / free-end panels |
 | `scripts/run_pipeline.py` | End-to-end run: solve → diagnose → plot |

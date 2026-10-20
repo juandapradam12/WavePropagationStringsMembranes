@@ -18,7 +18,8 @@
       "margin": 0.5,
       "energy_drift": 0.0026574683235867447
     },
-    "audio_wav": "results/string_midpoint.wav"
+    "audio_wav": "results/string_midpoint.wav",
+    "audio_wav_damped": "results/string_midpoint_damped.wav"
   },
   "membrane": {
     "length_m": 0.5,
@@ -69,6 +70,29 @@
     },
     "modes": {
       "odd_energy_fraction": 1.0
+    }
+  },
+  "extensions": {
+    "membrane_mode": {
+      "max_rel_l2": 0.00013463123496262427,
+      "final_rel_l2": 1.3808413181981167e-06
+    },
+    "cfl_demo": {
+      "stable_r": 0.9000000000000001,
+      "unstable_r": 1.05,
+      "stable_final_peak": 0.006514581086049954,
+      "unstable_final_peak": 3398160.304835623
+    },
+    "membrane_modes": {
+      "dominant": {
+        "m": 3,
+        "n": 1,
+        "energy_fraction": 0.2756710085196744
+      }
+    },
+    "damping": {
+      "gamma": 500.0,
+      "energy_ratio": 0.00550733289301572
     }
   }
 }

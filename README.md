@@ -268,6 +268,76 @@ physical readout of the same oscillation shown in Figure 5.
 
 ---
 
+## Membrane exact mode and modal content
+
+The square drumhead admits separable modes
+$A\cos(\omega_{mn}t)\sin(m\pi x/L)\sin(n\pi y/L)$. Evolving a pure
+$(1,1)$ initial field checks the 2D leapfrog against that closed form:
+
+<p align="center">
+  <img src="figures/13_membrane_exact.png" width="900" alt="Membrane exact mode comparison"/>
+</p>
+
+**Figure 14.** Center-point history and relative $L^2$ error for a pure
+$(1,1)$ membrane mode.
+
+Projecting the localized strike onto the rectangular basis shows which
+$(m,n)$ pairs carry the energy:
+
+<p align="center">
+  <img src="figures/15_membrane_modes.png" width="900" alt="Membrane rectangular modal spectrum"/>
+</p>
+
+**Figure 15.** Absolute modal amplitudes $|a_{mn}|$ and energy fractions
+for the centered strike.
+
+---
+
+## CFL in practice: stability vs blow-up
+
+The analytic bound $r\le 1$ is sharp. Integrating the same pluck at
+$r=0.9$ and $r=1.05$ makes the contrast immediate:
+
+<p align="center">
+  <img src="figures/14_cfl_blowup.png" width="900" alt="Stable vs unstable Courant number"/>
+</p>
+
+**Figure 16.** Peak displacement stays bounded below the CFL limit and
+grows exponentially once $r$ exceeds one.
+
+---
+
+## Damping and a free end
+
+Linear viscous friction $-\gamma\partial_t u$ turns the conservative string
+into a decaying oscillator,
+
+$$
+\partial_{tt} u = c^2 \partial_{xx} u - \gamma \partial_t u,
+$$
+
+and drains mechanical energy on a controllable timescale:
+
+<p align="center">
+  <img src="figures/16_damping.png" width="900" alt="Damped vs undamped string"/>
+</p>
+
+**Figure 17.** Mid-point oscillation and relative energy with
+$\gamma=500\,\mathrm{s^{-1}}$. The corresponding decaying tone is
+[`results/string_midpoint_damped.wav`](results/string_midpoint_damped.wav).
+
+Replacing the right Dirichlet condition by Neumann $u_x(L,t)=0$ changes
+the reflection law: the pulse returns without a sign flip.
+
+<p align="center">
+  <img src="figures/17_free_end.png" width="900" alt="Free-end string evolution"/>
+</p>
+
+**Figure 18.** Free right end — spatial snapshots and space–time diagram.
+Compare with Figure 4, where fixed ends invert the wave on reflection.
+
+---
+
 ## Workflow close-out
 
 Three time series summarize the narrative: the fixed string returns;
@@ -278,7 +348,7 @@ reflected fronts.
   <img src="figures/08_workflow_summary.png" width="920" alt="Summary time series for string and membrane"/>
 </p>
 
-**Figure 14.** End-to-end diagnostics. Left: mid-point of the fixed
+**Figure 19.** End-to-end diagnostics. Left: mid-point of the fixed
 string recovers after $T_1$. Center: an interior probe on the driven
 string shows resonant growth. Right: the membrane center oscillates as
 energy cycles between kinetic and potential form.

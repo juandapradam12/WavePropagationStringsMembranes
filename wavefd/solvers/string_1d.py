@@ -4,21 +4,15 @@ The continuous problem on a taut string is
 
 .. math::
 
-    \\partial_{tt} u = c^2 \\partial_{xx} u,
+    \\partial_{tt} u = c^2 \\partial_{xx} u - \\gamma \\partial_t u,
     \\qquad x \\in (0, L),\\ t > 0,
 
 with initial data :math:`u(x,0)=u_0(x)`, :math:`\\partial_t u(x,0)=0`, and
-Dirichlet (or driven) boundary conditions.
+Dirichlet, driven, or Neumann boundary conditions.
 
 The second-order centered scheme with Courant number
-:math:`r = c\\,\\Delta t / \\Delta x` reads
-
-.. math::
-
-    u^{n+1}_i = 2(1-r^2)\\,u^n_i - u^{n-1}_i
-    + r^2\\,(u^n_{i+1}+u^n_{i-1}),
-
-which is stable for :math:`r \\le 1` (CFL condition).
+:math:`r = c\\,\\Delta t / \\Delta x` is stable for :math:`r \\le 1`
+when :math:`\\gamma=0`.
 """
 
 from __future__ import annotations
@@ -33,6 +27,7 @@ import numpy as np
 class BoundaryMode(str, Enum):
     FIXED = "fixed"
     DRIVEN = "driven"
+    FREE = "free"  # left Dirichlet, right Neumann (u_x = 0)
 
 
 @dataclass(frozen=True)
@@ -43,9 +38,12 @@ class StringConfig:
     dt: float | None = None  # time step [s]; chosen from CFL if None
     n_periods: float = 1.0  # simulated duration in fundamental periods
     cfl: float = 0.5  # target Courant number when dt is auto-selected
+    gamma: float = 0.0  # linear viscous damping [1/s]
     snapshots_per_period: int = 8  # evenly spaced output frames per period
+    allow_unstable: bool = False  # permit r > 1 for CFL blow-up demos
 
     def fundamental_frequency(self, length: float) -> float:
+        """Fixed-fixed fundamental; for free end use the quarter-wave formula separately."""
         return self.c / (2.0 * length)
 
     def fundamental_period(self, length: float) -> float:
@@ -114,21 +112,24 @@ class StringWaveSolver:
         mode:
             ``fixed`` — homogeneous Dirichlet at both ends.
             ``driven`` — left end fixed, right end prescribed by ``drive(t)``.
+            ``free`` — left end fixed, right end Neumann (:math:`u_x=0`).
         drive:
-            Boundary forcing for the right endpoint. Defaults to a sinusoidal
-            drive at the fundamental frequency with amplitude equal to the
-            initial pluck height.
+            Boundary forcing for the right endpoint in driven mode. Defaults to
+            a sinusoid at the fixed-fixed fundamental frequency.
         """
         mode = BoundaryMode(mode)
         dt = self._time_step()
         r = self._courant(dt)
-        if r > 1.0 + 1e-12:
+        if r > 1.0 + 1e-12 and not self.config.allow_unstable:
             raise ValueError(f"Unstable Courant number r={r:.4f} > 1.")
 
         n_t = self._n_steps(dt)
         n_x = self.x.size
         u = np.zeros((n_t, n_x), dtype=float)
         t = np.arange(n_t, dtype=float) * dt
+        gamma = float(self.config.gamma)
+        damp_p = 0.5 * gamma * dt
+        denom = 1.0 + damp_p
 
         amp = float(np.max(np.abs(self.u0)))
         omega = 2.0 * np.pi * self.config.fundamental_frequency(self.length)
@@ -140,25 +141,44 @@ class StringWaveSolver:
         u[0, 0] = 0.0
         if mode is BoundaryMode.FIXED:
             u[0, -1] = 0.0
-        else:
+        elif mode is BoundaryMode.DRIVEN:
             u[0, -1] = float(drive(0.0))
+        # FREE: keep IC at the right end (Neumann will be enforced in the update)
 
-        # First step from rest (centered, second-order)
         r2 = r * r
-        interior = slice(1, -1)
-        lap0 = u[0, 2:] - 2.0 * u[0, 1:-1] + u[0, :-2]
-        u[1, interior] = u[0, interior] + 0.5 * r2 * lap0
-        u[1, 0] = 0.0
-        u[1, -1] = 0.0 if mode is BoundaryMode.FIXED else float(drive(t[1]))
 
-        # Leapfrog: u^{n+1} = 2 u^n - u^{n-1} + r^2 Δ_h u^n
+        # First step from rest (u_t = 0 ⇒ odd extension in time)
+        # With damping and u_t(0)=0 the starter remains the undamped centered step
+        # to second order: u^1 = u^0 + (1/2) r^2 Δ u^0.
+        if mode is BoundaryMode.FREE:
+            lap0 = _laplacian_free_right(u[0])
+            u[1, 1:] = u[0, 1:] + 0.5 * r2 * lap0
+        else:
+            lap0 = u[0, 2:] - 2.0 * u[0, 1:-1] + u[0, :-2]
+            u[1, 1:-1] = u[0, 1:-1] + 0.5 * r2 * lap0
+        u[1, 0] = 0.0
+        if mode is BoundaryMode.FIXED:
+            u[1, -1] = 0.0
+        elif mode is BoundaryMode.DRIVEN:
+            u[1, -1] = float(drive(t[1]))
+
+        # Leapfrog with optional linear damping:
+        # u^{n+1} = [2 u^n - (1 - γΔt/2) u^{n-1} + r^2 Δ u^n] / (1 + γΔt/2)
         for n in range(1, n_t - 1):
-            lap = u[n, 2:] - 2.0 * u[n, 1:-1] + u[n, :-2]
-            u[n + 1, interior] = 2.0 * u[n, interior] - u[n - 1, interior] + r2 * lap
+            if mode is BoundaryMode.FREE:
+                lap = _laplacian_free_right(u[n])
+                u[n + 1, 1:] = (
+                    2.0 * u[n, 1:] - (1.0 - damp_p) * u[n - 1, 1:] + r2 * lap
+                ) / denom
+            else:
+                lap = u[n, 2:] - 2.0 * u[n, 1:-1] + u[n, :-2]
+                u[n + 1, 1:-1] = (
+                    2.0 * u[n, 1:-1] - (1.0 - damp_p) * u[n - 1, 1:-1] + r2 * lap
+                ) / denom
             u[n + 1, 0] = 0.0
             if mode is BoundaryMode.FIXED:
                 u[n + 1, -1] = 0.0
-            else:
+            elif mode is BoundaryMode.DRIVEN:
                 u[n + 1, -1] = float(drive(t[n + 1]))
 
         energy = discrete_string_energy(u, self.dx, dt, self.config.c)
@@ -173,6 +193,20 @@ class StringWaveSolver:
         )
 
 
+def _laplacian_free_right(field: np.ndarray) -> np.ndarray:
+    """Second difference on indices 1..n-1 with a Neumann ghost at the right end.
+
+    Ghost condition :math:`u_x=0` ⇒ :math:`u_{N+1}=u_{N-1}`, so the stencil at
+    the boundary node is :math:`2u_{N-1}-2u_N` in zero-based indexing
+    (:math:`2u[-2]-2u[-1]`).
+    """
+    n = field.size
+    lap = np.empty(n - 1, dtype=float)
+    lap[:-1] = field[2:] - 2.0 * field[1:-1] + field[:-2]
+    lap[-1] = 2.0 * field[-2] - 2.0 * field[-1]
+    return lap
+
+
 def discrete_string_energy(u: np.ndarray, dx: float, dt: float, c: float) -> np.ndarray:
     """Second-order discrete mechanical energy of a vibrating string.
 
@@ -180,11 +214,9 @@ def discrete_string_energy(u: np.ndarray, dx: float, dt: float, c: float) -> np.
     approximation for :math:`\\partial_t u` between consecutive frames, then
     averages so the returned array aligns with each time index.
     """
-    # Spatial potential: (c^2/2) ∫ (u_x)^2 dx
     ux = np.diff(u, axis=1) / dx
     potential = 0.5 * c * c * dx * np.sum(ux * ux, axis=1)
 
-    # Kinetic: (1/2) ∫ (u_t)^2 dx between n and n+1
     ut = np.diff(u, axis=0) / dt
     kinetic_half = 0.5 * dx * np.sum(ut * ut, axis=1)
 
