@@ -352,19 +352,19 @@ central strike then evolves differently from the clamped case: the rim is
 allowed to move, and reflections do not force a node at the boundary.
 
 <p align="center">
+  <img src="figures/free_membrane_evolution.gif" width="520" alt="Animated free membrane evolution"/>
+</p>
+
+**Figure 19.** Temporal evolution of the free membrane over one $(1,1)$
+period: the wavefront reaches the rim and reflects without pinning $u$ to
+zero on the boundary.
+
+<p align="center">
   <img src="figures/18_free_membrane.png" width="760" alt="Clamped vs free membrane strike"/>
 </p>
 
-**Figure 19.** Identical initial strike under clamped ($u=0$) and free
-($\partial_n u=0$) edges. At half a $(1,1)$ period the free rim has
-already left the plane $u=0$.
-
-<p align="center">
-  <img src="figures/free_membrane_evolution.gif" width="480" alt="Animated free membrane evolution"/>
-</p>
-
-**Figure 19b.** Temporal evolution of the free membrane: the wavefront
-reaches the rim and reflects without pinning $u$ to zero on the boundary.
+**Figure 19b.** Side-by-side snapshots of the same strike under clamped
+($u=0$) and free ($\partial_n u=0$) edges.
 
 Free rectangular modes are cosines,
 $A\cos(\omega_{mn}t)\cos(m\pi x/L)\cos(n\pi y/L)$ with $m,n\ge 0$. A pure
