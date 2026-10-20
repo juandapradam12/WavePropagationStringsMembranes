@@ -5,17 +5,23 @@
     \\partial_{tt} u = c^2 \\nabla^2 u,
     \\qquad (x,y)\\in(0,L)^2,\\ t>0,
 
-with clamped edges :math:`u|_{\\partial\\Omega}=0` and vanishing initial velocity.
-The five-point Laplacian scheme with Courant number
-:math:`r = c\\,\\Delta t / \\Delta x` (for equal spacing) is stable when
-:math:`r \\le 1/\\sqrt{2}`.
+with either clamped edges :math:`u|_{\\partial\\Omega}=0` (Dirichlet) or free
+edges :math:`\\partial_n u|_{\\partial\\Omega}=0` (Neumann), and vanishing
+initial velocity. The five-point scheme with Courant number
+:math:`r = c\\,\\Delta t / \\Delta x` is stable for :math:`r \\le 1/\\sqrt{2}`.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 
 import numpy as np
+
+
+class MembraneBoundary(str, Enum):
+    CLAMPED = "clamped"
+    FREE = "free"
 
 
 @dataclass(frozen=True)
@@ -25,12 +31,17 @@ class MembraneConfig:
     c: float = 250.0
     length: float = 0.5  # side length [m]
     dt: float | None = None
-    n_periods: float = 1.0  # duration in units of the (1,1) mode period
+    n_periods: float = 1.0  # duration in units of the clamped (1,1) mode period
     cfl: float = 0.4  # target Courant number (must be <= 1/sqrt(2))
     snapshots_per_period: int = 8
 
-    def mode_frequency(self, m: int = 1, n: int = 1) -> float:
-        """Analytic frequency of the rectangular mode :math:`(m,n)`."""
+    def mode_frequency(self, m: int = 1, n: int = 1, *, free: bool = False) -> float:
+        """Analytic frequency of rectangular mode :math:`(m,n)`.
+
+        Clamped modes use sine factors with :math:`m,n\\ge 1`. Free (Neumann)
+        modes use cosines with :math:`m,n\\ge 0`; the rigid mode `(0,0)` has
+        frequency zero.
+        """
         return 0.5 * self.c * np.sqrt((m / self.length) ** 2 + (n / self.length) ** 2)
 
     def fundamental_period(self) -> float:
@@ -48,6 +59,7 @@ class MembraneSolution:
     r: float
     energy: np.ndarray
     config: MembraneConfig
+    boundary: MembraneBoundary = MembraneBoundary.CLAMPED
 
     @property
     def dx(self) -> float:
@@ -83,7 +95,8 @@ class MembraneWaveSolver:
         t_end = self.config.n_periods * self.config.fundamental_period()
         return max(2, int(np.ceil(t_end / dt)) + 1)
 
-    def solve(self) -> MembraneSolution:
+    def solve(self, boundary: MembraneBoundary | str = MembraneBoundary.CLAMPED) -> MembraneSolution:
+        boundary = MembraneBoundary(boundary)
         dt = self._time_step()
         r = self.config.c * dt / self.dx
         r_max = 1.0 / np.sqrt(2.0)
@@ -97,21 +110,29 @@ class MembraneWaveSolver:
         r2 = r * r
 
         u[0] = self.u0
-        u[0, 0, :] = u[0, -1, :] = u[0, :, 0] = u[0, :, -1] = 0.0
+        if boundary is MembraneBoundary.CLAMPED:
+            u[0, 0, :] = u[0, -1, :] = u[0, :, 0] = u[0, :, -1] = 0.0
 
         # First step from rest
-        lap0 = _laplacian(u[0])
-        u[1, 1:-1, 1:-1] = u[0, 1:-1, 1:-1] + 0.5 * r2 * lap0
-        u[1, 0, :] = u[1, -1, :] = u[1, :, 0] = u[1, :, -1] = 0.0
+        if boundary is MembraneBoundary.CLAMPED:
+            lap0 = _laplacian_dirichlet(u[0])
+            u[1, 1:-1, 1:-1] = u[0, 1:-1, 1:-1] + 0.5 * r2 * lap0
+            u[1, 0, :] = u[1, -1, :] = u[1, :, 0] = u[1, :, -1] = 0.0
+        else:
+            lap0 = _laplacian_neumann(u[0])
+            u[1] = u[0] + 0.5 * r2 * lap0
 
-        # Leapfrog: u^{n+1} = 2 u^n - u^{n-1} + r^2 Δ_h u^n
         for k in range(1, n_t - 1):
-            lap = _laplacian(u[k])
-            u[k + 1, 1:-1, 1:-1] = (
-                2.0 * u[k, 1:-1, 1:-1] - u[k - 1, 1:-1, 1:-1] + r2 * lap
-            )
-            u[k + 1, 0, :] = u[k + 1, -1, :] = 0.0
-            u[k + 1, :, 0] = u[k + 1, :, -1] = 0.0
+            if boundary is MembraneBoundary.CLAMPED:
+                lap = _laplacian_dirichlet(u[k])
+                u[k + 1, 1:-1, 1:-1] = (
+                    2.0 * u[k, 1:-1, 1:-1] - u[k - 1, 1:-1, 1:-1] + r2 * lap
+                )
+                u[k + 1, 0, :] = u[k + 1, -1, :] = 0.0
+                u[k + 1, :, 0] = u[k + 1, :, -1] = 0.0
+            else:
+                lap = _laplacian_neumann(u[k])
+                u[k + 1] = 2.0 * u[k] - u[k - 1] + r2 * lap
 
         energy = discrete_membrane_energy(u, self.dx, dt, self.config.c)
         return MembraneSolution(
@@ -122,15 +143,12 @@ class MembraneWaveSolver:
             r=r,
             energy=energy,
             config=self.config,
+            boundary=boundary,
         )
 
 
-def _laplacian(field: np.ndarray) -> np.ndarray:
-    """Five-point Laplacian on the interior, without the 1/dx^2 factor.
-
-    Returns an (ny-2, nx-2) array equal to
-    ``u_{i+1,j}+u_{i-1,j}+u_{i,j+1}+u_{i,j-1}-4u_{i,j}``.
-    """
+def _laplacian_dirichlet(field: np.ndarray) -> np.ndarray:
+    """Five-point Laplacian on the interior (Dirichlet boundaries held fixed)."""
     return (
         field[2:, 1:-1]
         + field[:-2, 1:-1]
@@ -140,11 +158,40 @@ def _laplacian(field: np.ndarray) -> np.ndarray:
     )
 
 
+def _laplacian_neumann(field: np.ndarray) -> np.ndarray:
+    """Five-point Laplacian on the full grid with Neumann ghosts on all edges.
+
+    Ghost reflections enforce :math:`\\partial_n u=0`:
+    outside-left equals the first interior neighbour, and likewise on the
+    other three sides. Corners see both reflected neighbours.
+    """
+    n = field.shape[0]
+    # Pad with reflected boundary layers
+    padded = np.empty((n + 2, n + 2), dtype=float)
+    padded[1:-1, 1:-1] = field
+    padded[0, 1:-1] = field[1, :]  # bottom ghost = first row above boundary
+    padded[-1, 1:-1] = field[-2, :]
+    padded[1:-1, 0] = field[:, 1]
+    padded[1:-1, -1] = field[:, -2]
+    # Corner ghosts (consistent with both Neumann conditions)
+    padded[0, 0] = field[1, 1]
+    padded[0, -1] = field[1, -2]
+    padded[-1, 0] = field[-2, 1]
+    padded[-1, -1] = field[-2, -2]
+
+    return (
+        padded[2:, 1:-1]
+        + padded[:-2, 1:-1]
+        + padded[1:-1, 2:]
+        + padded[1:-1, :-2]
+        - 4.0 * padded[1:-1, 1:-1]
+    )
+
+
 def discrete_membrane_energy(u: np.ndarray, dx: float, dt: float, c: float) -> np.ndarray:
     """Discrete mechanical energy of a vibrating membrane."""
     ux = np.diff(u, axis=2) / dx
     uy = np.diff(u, axis=1) / dx
-    # Align shapes by dropping the last row/col of the mismatched derivative
     potential = 0.5 * c * c * dx * dx * (
         np.sum(ux[:, :-1, :] ** 2, axis=(1, 2)) + np.sum(uy[:, :, :-1] ** 2, axis=(1, 2))
     )

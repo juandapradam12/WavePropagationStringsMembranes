@@ -18,6 +18,7 @@ from wavefd.solvers.membrane_2d import MembraneSolution
 from wavefd.solvers.string_1d import StringSolution
 from wavefd.viz.animations import animate_membrane_gif, animate_string_gif
 from wavefd.viz.style import PALETTE, apply_style
+from wavefd.viz.validation_figures import generate_validation_figures
 
 
 def generate_all_figures(
@@ -28,8 +29,8 @@ def generate_all_figures(
     string_u0: np.ndarray,
     membrane_u0: np.ndarray,
     out_dir: str | Path,
-) -> dict[str, Path]:
-    """Write every storytelling figure and return their paths."""
+) -> tuple[dict[str, Path], dict]:
+    """Write every storytelling figure and return paths plus validation summary."""
     apply_style()
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -47,7 +48,10 @@ def generate_all_figures(
     paths["membrane_gif"] = animate_membrane_gif(membrane, out / "membrane_evolution.gif")
     paths["membrane_energy"] = _fig_energy(membrane, "membrane_energy.png", "Clamped membrane", out)
     paths["workflow"] = _fig_workflow_summary(string_fixed, string_driven, membrane, out)
-    return paths
+
+    validation_paths, validation_summary = generate_validation_figures(string_fixed, out)
+    paths.update(validation_paths)
+    return paths, validation_summary
 
 
 def _save(fig: plt.Figure, path: Path) -> Path:

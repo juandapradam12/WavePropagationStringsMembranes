@@ -9,6 +9,4 @@ build/
 .venv/
 venv/
 results/*.dat
-*.WAV
-*.wav
 .DS_Store

@@ -197,6 +197,187 @@ drive the relative drift stays near $5\times 10^{-3}$, consistent with the
 
 ---
 
+## Verification against exact solutions
+
+With vanishing initial velocity the fixed-end problem has the d'Alembert
+representation
+
+$$
+u(x,t)=\frac12\bigl[F(x-ct)+F(x+ct)\bigr],
+$$
+
+where $F$ is the odd $2L$-periodic extension of the initial pluck. Comparing
+the leapfrog field to this reference isolates the discretization error.
+
+<p align="center">
+  <img src="figures/09_exact_comparison.png" width="900" alt="Exact vs numerical mid-point and L2 error"/>
+</p>
+
+**Figure 10.** Left: mid-point displacement from the scheme and from
+d'Alembert's formula. Right: relative $L^2$ error (normalized by the initial
+norm) as a function of time.
+
+A pure standing wave $u(x,0)=A\sin(\pi x/L)$ removes the kink and yields a
+clean convergence test. Refining $\Delta x$ at fixed Courant number, the
+leapfrog scheme (formally $\mathcal{O}(\Delta x^2,\Delta t^2)$) shows a
+higher observed rate on this grid eigenmode:
+
+<p align="center">
+  <img src="figures/10_convergence.png" width="720" alt="Spatial convergence study"/>
+</p>
+
+**Figure 11.** Relative $L^2$ error at $t=T_1/2$ versus $\Delta x$ for the
+fundamental mode. Guides of slope 2 and 4 are shown; the measured rate on
+this eigenmode sits near four.
+
+---
+
+## Modal content and numerical dispersion
+
+Projecting the initial pluck onto Dirichlet sine modes recovers the
+classic odd-harmonic spectrum $b_n\propto 1/n^2$:
+
+<p align="center">
+  <img src="figures/11_modal_spectrum.png" width="900" alt="Modal coefficients and energy fractions"/>
+</p>
+
+**Figure 12.** Left: discrete sine coefficients versus the analytic
+$b_n$. Right: modal energy fractions — essentially all of the energy
+lives on odd $n$.
+
+The leapfrog update is nondissipative but dispersive. Its symbol
+
+$$
+\omega_{\mathrm{num}}(\kappa)=\frac{2}{\Delta t}\arcsin\bigl(r\sin(\kappa\Delta x/2)\bigr)
+$$
+
+tracks the exact branch $\omega=c\kappa$ on long waves and peels away toward
+the Nyquist mode:
+
+<p align="center">
+  <img src="figures/12_dispersion.png" width="900" alt="Numerical dispersion relation"/>
+</p>
+
+**Figure 13.** Exact and discrete dispersion curves at the working Courant
+number, with the phase-speed ratio $\omega_{\mathrm{num}}/(c\kappa)$.
+
+Because $f_1=c/(2L)\approx 195\,\mathrm{Hz}$ already lies in the hearing
+range, the mid-point trace can be tiled into an audible WAV
+([`results/string_midpoint.wav`](results/string_midpoint.wav)) — a direct
+physical readout of the same oscillation shown in Figure 5.
+
+---
+
+## Membrane exact mode and modal content
+
+The square drumhead admits separable modes
+$A\cos(\omega_{mn}t)\sin(m\pi x/L)\sin(n\pi y/L)$. Evolving a pure
+$(1,1)$ initial field checks the 2D leapfrog against that closed form:
+
+<p align="center">
+  <img src="figures/13_membrane_exact.png" width="900" alt="Membrane exact mode comparison"/>
+</p>
+
+**Figure 14.** Center-point history and relative $L^2$ error for a pure
+$(1,1)$ membrane mode.
+
+Projecting the localized strike onto the rectangular basis shows which
+$(m,n)$ pairs carry the energy:
+
+<p align="center">
+  <img src="figures/15_membrane_modes.png" width="900" alt="Membrane rectangular modal spectrum"/>
+</p>
+
+**Figure 15.** Absolute modal amplitudes $|a_{mn}|$ and energy fractions
+for the centered strike.
+
+---
+
+## CFL in practice: stability vs blow-up
+
+The analytic bound $r\le 1$ is sharp. Integrating the same pluck at
+$r=0.9$ and $r=1.05$ makes the contrast immediate:
+
+<p align="center">
+  <img src="figures/14_cfl_blowup.png" width="900" alt="Stable vs unstable Courant number"/>
+</p>
+
+**Figure 16.** Peak displacement stays bounded below the CFL limit and
+grows exponentially once $r$ exceeds one.
+
+---
+
+## Damping and a free end
+
+Linear viscous friction $-\gamma\partial_t u$ turns the conservative string
+into a decaying oscillator,
+
+$$
+\partial_{tt} u = c^2 \partial_{xx} u - \gamma \partial_t u,
+$$
+
+and drains mechanical energy on a controllable timescale:
+
+<p align="center">
+  <img src="figures/16_damping.png" width="900" alt="Damped vs undamped string"/>
+</p>
+
+**Figure 17.** Mid-point oscillation and relative energy with
+$\gamma=500\,\mathrm{s^{-1}}$. The corresponding decaying tone is
+[`results/string_midpoint_damped.wav`](results/string_midpoint_damped.wav).
+
+Replacing the right Dirichlet condition by Neumann $u_x(L,t)=0$ changes
+the reflection law: the pulse returns without a sign flip.
+
+<p align="center">
+  <img src="figures/17_free_end.png" width="900" alt="Free-end string evolution"/>
+</p>
+
+**Figure 18.** Free right end — spatial snapshots and space–time diagram.
+Compare with Figure 4, where fixed ends invert the wave on reflection.
+
+---
+
+## Free membrane: Neumann edges
+
+A free drumhead is not a membrane without boundaries. On a finite square
+the free-edge condition is Neumann,
+
+$$
+\partial_n u = 0 \quad\text{on}\quad \partial\Omega,
+$$
+
+implemented with reflected ghost points on all four sides. The same
+central strike then evolves differently from the clamped case: the rim is
+allowed to move, and reflections do not force a node at the boundary.
+
+<p align="center">
+  <img src="figures/free_membrane_evolution.gif" width="520" alt="Animated free membrane evolution"/>
+</p>
+
+**Figure 19.** Temporal evolution of the free membrane over one $(1,1)$
+period: the wavefront reaches the rim and reflects without pinning $u$ to
+zero on the boundary.
+
+<p align="center">
+  <img src="figures/18_free_membrane.png" width="760" alt="Clamped vs free membrane strike"/>
+</p>
+
+**Figure 19b.** Side-by-side snapshots of the same strike under clamped
+($u=0$) and free ($\partial_n u=0$) edges.
+
+Free rectangular modes are cosines,
+$A\cos(\omega_{mn}t)\cos(m\pi x/L)\cos(n\pi y/L)$ with $m,n\ge 0$. A pure
+$(1,0)$ field checks the Neumann leapfrog against that closed form:
+
+<p align="center">
+  <img src="figures/19_free_membrane_exact.png" width="900" alt="Free membrane exact mode check"/>
+</p>
+
+**Figure 20.** Free-membrane verification for the $(1,0)$ cosine mode.
+
+---
+
 ## Workflow close-out
 
 Three time series summarize the narrative: the fixed string returns;
@@ -207,7 +388,7 @@ reflected fronts.
   <img src="figures/08_workflow_summary.png" width="920" alt="Summary time series for string and membrane"/>
 </p>
 
-**Figure 10.** End-to-end diagnostics. Left: mid-point of the fixed
+**Figure 21.** End-to-end diagnostics. Left: mid-point of the fixed
 string recovers after $T_1$. Center: an interior probe on the driven
 string shows resonant growth. Right: the membrane center oscillates as
 energy cycles between kinetic and potential form.
@@ -219,14 +400,14 @@ energy cycles between kinetic and potential form.
 ```text
 wavefd/
   solvers/          # 1D and 2D leapfrog solvers
-  analysis/         # CFL, energy drift, period estimates
-  viz/              # figure suite used above
+  analysis/         # CFL, energy, exact series, modes, dispersion, audio
+  viz/              # figure and GIF suite used above
   io.py             # initial-condition loaders
 data/               # string and membrane initial fields
 scripts/run_pipeline.py
 docs/methodology.md
 figures/            # README figures (generated)
-results/            # JSON summary and sparse snapshots
+results/            # JSON summary, WAV, sparse snapshots
 ```
 
 ---
