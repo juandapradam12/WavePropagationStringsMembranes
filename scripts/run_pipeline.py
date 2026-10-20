@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from wavefd.analysis.audio import export_string_wav, midpoint_waveform
 from wavefd.analysis.diagnostics import (
     cfl_report,
     relative_energy_drift,
@@ -32,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--membrane-periods", type=float, default=1.0)
     p.add_argument("--cfl-1d", type=float, default=0.5)
     p.add_argument("--cfl-2d", type=float, default=0.4)
+    p.add_argument("--audio-duration", type=float, default=1.5)
     return p.parse_args()
 
 
@@ -54,19 +56,40 @@ def main() -> None:
     L = float(x[-1] - x[0])
     T1 = string_cfg.fundamental_period(L)
     T_est = standing_wave_period_estimate(string_fixed)
+    dt = float(string_fixed.t[1] - string_fixed.t[0])
+
+    wav_path = export_string_wav(
+        midpoint_waveform(string_fixed.u),
+        dt,
+        args.results_dir / "string_midpoint.wav",
+        duration_s=args.audio_duration,
+    )
+
+    paths, validation = generate_all_figures(
+        string_fixed=string_fixed,
+        string_driven=string_driven,
+        membrane=membrane,
+        string_x0=x,
+        string_u0=u0,
+        membrane_u0=membrane_u0,
+        out_dir=args.figure_dir,
+    )
+
     summary = {
         "string": {
             "length_m": L,
             "wave_speed_m_s": string_cfg.c,
             "dx_m": float(x[1] - x[0]),
-            "dt_s": float(string_fixed.t[1] - string_fixed.t[0]),
+            "dt_s": dt,
             "courant": string_fixed.r,
             "n_time": int(string_fixed.t.size),
             "fundamental_period_s": T1,
+            "fundamental_frequency_hz": 1.0 / T1,
             "estimated_period_s": T_est,
             "period_relative_error": abs(T_est - T1) / T1 if T_est == T_est else None,
             "energy_drift": relative_energy_drift(string_fixed.energy),
             "cfl": cfl_report(string_fixed),
+            "audio_wav": str(wav_path.relative_to(ROOT)),
         },
         "membrane": {
             "length_m": membrane_cfg.length,
@@ -85,6 +108,7 @@ def main() -> None:
                 string_driven.energy[-1] / string_driven.energy[0]
             ),
         },
+        "validation": validation,
     }
 
     summary_path = args.results_dir / "summary.json"
@@ -101,21 +125,12 @@ def main() -> None:
     for frac, idx in zip((0.0, 0.25, 0.5, 0.75), membrane.snapshot_indices((0.0, 0.25, 0.5, 0.75))):
         save_array(args.results_dir / f"membrane_tfrac_{frac:.2f}.dat", membrane.u[idx])
 
-    paths = generate_all_figures(
-        string_fixed=string_fixed,
-        string_driven=string_driven,
-        membrane=membrane,
-        string_x0=x,
-        string_u0=u0,
-        membrane_u0=membrane_u0,
-        out_dir=args.figure_dir,
-    )
-
     print("Simulation summary")
     print(json.dumps(summary, indent=2))
     print("\nFigures written:")
     for key, path in paths.items():
         print(f"  {key:20s} -> {path}")
+    print(f"\nAudio written: {wav_path}")
 
 
 if __name__ == "__main__":

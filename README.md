@@ -197,6 +197,77 @@ drive the relative drift stays near $5\times 10^{-3}$, consistent with the
 
 ---
 
+## Verification against exact solutions
+
+With vanishing initial velocity the fixed-end problem has the d'Alembert
+representation
+
+$$
+u(x,t)=\frac12\bigl[F(x-ct)+F(x+ct)\bigr],
+$$
+
+where $F$ is the odd $2L$-periodic extension of the initial pluck. Comparing
+the leapfrog field to this reference isolates the discretization error.
+
+<p align="center">
+  <img src="figures/09_exact_comparison.png" width="900" alt="Exact vs numerical mid-point and L2 error"/>
+</p>
+
+**Figure 10.** Left: mid-point displacement from the scheme and from
+d'Alembert's formula. Right: relative $L^2$ error (normalized by the initial
+norm) as a function of time.
+
+A pure standing wave $u(x,0)=A\sin(\pi x/L)$ removes the kink and yields a
+clean convergence test. Refining $\Delta x$ at fixed Courant number, the
+leapfrog scheme (formally $\mathcal{O}(\Delta x^2,\Delta t^2)$) shows a
+higher observed rate on this grid eigenmode:
+
+<p align="center">
+  <img src="figures/10_convergence.png" width="720" alt="Spatial convergence study"/>
+</p>
+
+**Figure 11.** Relative $L^2$ error at $t=T_1/2$ versus $\Delta x$ for the
+fundamental mode. Guides of slope 2 and 4 are shown; the measured rate on
+this eigenmode sits near four.
+
+---
+
+## Modal content and numerical dispersion
+
+Projecting the initial pluck onto Dirichlet sine modes recovers the
+classic odd-harmonic spectrum $b_n\propto 1/n^2$:
+
+<p align="center">
+  <img src="figures/11_modal_spectrum.png" width="900" alt="Modal coefficients and energy fractions"/>
+</p>
+
+**Figure 12.** Left: discrete sine coefficients versus the analytic
+$b_n$. Right: modal energy fractions — essentially all of the energy
+lives on odd $n$.
+
+The leapfrog update is nondissipative but dispersive. Its symbol
+
+$$
+\omega_{\mathrm{num}}(\kappa)=\frac{2}{\Delta t}\arcsin\bigl(r\sin(\kappa\Delta x/2)\bigr)
+$$
+
+tracks the exact branch $\omega=c\kappa$ on long waves and peels away toward
+the Nyquist mode:
+
+<p align="center">
+  <img src="figures/12_dispersion.png" width="900" alt="Numerical dispersion relation"/>
+</p>
+
+**Figure 13.** Exact and discrete dispersion curves at the working Courant
+number, with the phase-speed ratio $\omega_{\mathrm{num}}/(c\kappa)$.
+
+Because $f_1=c/(2L)\approx 195\,\mathrm{Hz}$ already lies in the hearing
+range, the mid-point trace can be tiled into an audible WAV
+([`results/string_midpoint.wav`](results/string_midpoint.wav)) — a direct
+physical readout of the same oscillation shown in Figure 5.
+
+---
+
 ## Workflow close-out
 
 Three time series summarize the narrative: the fixed string returns;
@@ -207,7 +278,7 @@ reflected fronts.
   <img src="figures/08_workflow_summary.png" width="920" alt="Summary time series for string and membrane"/>
 </p>
 
-**Figure 10.** End-to-end diagnostics. Left: mid-point of the fixed
+**Figure 14.** End-to-end diagnostics. Left: mid-point of the fixed
 string recovers after $T_1$. Center: an interior probe on the driven
 string shows resonant growth. Right: the membrane center oscillates as
 energy cycles between kinetic and potential form.
@@ -219,14 +290,14 @@ energy cycles between kinetic and potential form.
 ```text
 wavefd/
   solvers/          # 1D and 2D leapfrog solvers
-  analysis/         # CFL, energy drift, period estimates
-  viz/              # figure suite used above
+  analysis/         # CFL, energy, exact series, modes, dispersion, audio
+  viz/              # figure and GIF suite used above
   io.py             # initial-condition loaders
 data/               # string and membrane initial fields
 scripts/run_pipeline.py
 docs/methodology.md
 figures/            # README figures (generated)
-results/            # JSON summary and sparse snapshots
+results/            # JSON summary, WAV, sparse snapshots
 ```
 
 ---

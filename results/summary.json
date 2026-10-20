@@ -7,6 +7,7 @@
     "courant": 0.5,
     "n_time": 513,
     "fundamental_period_s": 0.00512,
+    "fundamental_frequency_hz": 195.31249999999997,
     "estimated_period_s": 0.00512,
     "period_relative_error": 0.0,
     "energy_drift": 0.0026574683235867447,
@@ -16,7 +17,8 @@
       "courant_limit": 1.0,
       "margin": 0.5,
       "energy_drift": 0.0026574683235867447
-    }
+    },
+    "audio_wav": "results/string_midpoint.wav"
   },
   "membrane": {
     "length_m": 0.5,
@@ -38,5 +40,35 @@
   "driven_string": {
     "energy_drift": 0.9558829505134655,
     "final_over_initial_energy": 1.9558829505134654
+  },
+  "validation": {
+    "exact": {
+      "max_rel_l2": 0.006391111845690601,
+      "final_rel_l2": 0.005860144716780224
+    },
+    "convergence": {
+      "dx": [
+        0.02,
+        0.01,
+        0.005,
+        0.0025
+      ],
+      "rel_l2": [
+        4.478165004770127e-07,
+        2.7982216215206205e-08,
+        1.7487900303853947e-09,
+        1.092993358534802e-10
+      ],
+      "observed_orders": [
+        null,
+        4.000325552644478,
+        4.000081243046057,
+        4.000000541780808
+      ],
+      "mean_order": 4.000135779157113
+    },
+    "modes": {
+      "odd_energy_fraction": 1.0
+    }
   }
 }

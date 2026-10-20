@@ -76,6 +76,28 @@ closed systems (fixed boundaries, no drive) the relative drift
 $\max|E^n-E^0|/|E^0|$ is the primary consistency diagnostic reported in the
 figures.
 
+## Exact references
+
+With $\partial_t u(x,0)=0$ the fixed-end solution is given by d'Alembert's
+formula on the odd $2L$-periodic extension $F$ of the initial data:
+
+$$
+u(x,t)=\frac12\bigl[F(x-ct)+F(x+ct)\bigr].
+$$
+
+A triangular pluck of height $A$ peaking at mid-span has sine coefficients
+$b_n=8A/(n^2\pi^2)$ for odd $n$ (zero for even $n$), used for the modal
+spectrum figure. Grid-refinement studies use a pure eigenmode
+$A\sin(n\pi x/L)$ so the measured order is not polluted by series truncation.
+
+The leapfrog dispersion relation
+
+$$
+\omega_{\mathrm{num}}(\kappa)=\frac{2}{\Delta t}\arcsin\bigl(r\sin(\kappa\Delta x/2)\bigr)
+$$
+
+is implemented under `wavefd/analysis/` and plotted by the pipeline.
+
 ## Code map
 
 | Module | Role |
@@ -83,5 +105,10 @@ figures.
 | `wavefd/solvers/string_1d.py` | 1D leapfrog solver and string energy |
 | `wavefd/solvers/membrane_2d.py` | 2D leapfrog solver and membrane energy |
 | `wavefd/analysis/diagnostics.py` | CFL report, energy drift, period estimate |
+| `wavefd/analysis/exact.py` | Modal series reference and $L^2$ errors |
+| `wavefd/analysis/convergence.py` | Grid-refinement study |
+| `wavefd/analysis/modes.py` | Discrete sine projection |
+| `wavefd/analysis/dispersion.py` | Leapfrog dispersion relation |
+| `wavefd/analysis/audio.py` | Mid-point WAV export |
 | `wavefd/viz/figures.py` | Figure suite used by the README |
 | `scripts/run_pipeline.py` | End-to-end run: solve → diagnose → plot |
