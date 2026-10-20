@@ -8,7 +8,6 @@ version = "1.0.0"
 description = "Explicit finite-difference solvers for the 1D and 2D wave equation"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
 authors = [{ name = "Juan David Prada Malagon" }]
 dependencies = [
   "numpy>=1.24",
