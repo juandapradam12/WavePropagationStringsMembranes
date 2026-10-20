@@ -48,7 +48,7 @@ def test_membrane_energy_stable():
     xx = np.linspace(0.0, L, n)
     X, Y = np.meshgrid(xx, xx)
     u0 = 0.01 * np.sin(np.pi * X / L) * np.sin(np.pi * Y / L)
-    cfg = MembraneConfig(length=L, cfl=0.4, n_periods=0.5)
+    cfg = MembraneConfig(length=L, cfl=0.4, n_periods=1.0)
     sol = MembraneWaveSolver(u0, cfg).solve()
     assert relative_energy_drift(sol.energy) < 2e-2
     assert sol.r <= 1.0 / np.sqrt(2.0) + 1e-12

@@ -88,12 +88,19 @@ with a sign change at a Dirichlet end. After one fundamental period the
 profile reforms — a direct numerical check of $T_1=2L/c$.
 
 <p align="center">
+  <img src="figures/string_evolution.gif" width="720" alt="Animated temporal evolution of the fixed string"/>
+</p>
+
+**Figure 3.** Temporal evolution of the fixed-end string over one
+fundamental period. The pluck splits into counter-propagating pulses that
+reflect with a sign change and reform the initial profile at $t=T_1$.
+
+<p align="center">
   <img src="figures/03_string_fixed_evolution.png" width="860" alt="String profiles over one period"/>
 </p>
 
-**Figure 3.** Snapshots through one fundamental period. The initial
-triangle opens into counter-propagating pulses; by $t=T_1$ the shape has
-essentially returned, as expected for a non-dispersive string.
+**Figure 3b.** Discrete snapshots of the same evolution at
+$t/T_1\in\{0,0.25,0.5,0.75,1\}$.
 
 <p align="center">
   <img src="figures/04_string_spacetime.png" width="820" alt="Space-time diagram of the fixed string"/>
@@ -166,21 +173,27 @@ and folds back through itself, producing the interference pattern of a
 rectangular membrane.
 
 <p align="center">
+  <img src="figures/membrane_evolution.gif" width="480" alt="Animated temporal evolution of the clamped membrane"/>
+</p>
+
+**Figure 8.** Temporal evolution of the clamped membrane over one
+$(1,1)$-mode period $T_{11}$. A centered strike launches a circular front
+that expands, reflects from the rim, and interferes with itself.
+
+<p align="center">
   <img src="figures/07_membrane_evolution.png" width="720" alt="Membrane displacement at successive fractions of T11"/>
 </p>
 
-**Figure 8.** Membrane displacement at successive fractions of the
-$(1,1)$-mode period $T_{11}$. The initially compact bump spreads into a
-ring, reverses at the boundary, and reorganizes under modal
-interference.
+**Figure 8b.** Snapshots at $t/T_{11}\in\{0,0.25,0.5,0.75\}$ from the same
+run.
 
 <p align="center">
   <img src="figures/membrane_energy.png" width="780" alt="Discrete energy of the membrane"/>
 </p>
 
 **Figure 9.** Discrete energy of the clamped membrane. With no external
-drive the relative drift stays near $10^{-2}$, consistent with the 2D
-CFL-stable leapfrog scheme on a localized strike.
+drive the relative drift stays near $5\times 10^{-3}$, consistent with the
+2D CFL-stable leapfrog scheme on a localized strike.
 
 ---
 

@@ -25,7 +25,7 @@ class MembraneConfig:
     c: float = 250.0
     length: float = 0.5  # side length [m]
     dt: float | None = None
-    n_periods: float = 0.5  # duration in units of the (1,1) mode period
+    n_periods: float = 1.0  # duration in units of the (1,1) mode period
     cfl: float = 0.4  # target Courant number (must be <= 1/sqrt(2))
     snapshots_per_period: int = 8
 

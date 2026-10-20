@@ -19,5 +19,5 @@ test:
 	$(PYTHON) -m pytest -q tests
 
 clean:
-	rm -rf $(RESULTS_DIR)/* $(FIGURE_DIR)/*.png
+	rm -rf $(RESULTS_DIR)/* $(FIGURE_DIR)/*.png $(FIGURE_DIR)/*.gif
 	find . -type d -name __pycache__ -exec rm -rf {} +
