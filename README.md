@@ -136,9 +136,9 @@ gives a sharp consistency diagnostic:
   <img src="figures/string_energy.png" width="780" alt="Discrete energy of the fixed string"/>
 </p>
 
-**Figure 6.** Relative discrete energy of the fixed-end string. Drift
-remains at the level expected for a second-order, non-dissipative
-scheme.
+**Figure 6.** Relative discrete energy of the fixed-end string. Peak
+relative drift is $\sim 3\times 10^{-3}$, as expected for a second-order,
+non-dissipative scheme on a non-smooth initial pluck.
 
 ---
 
@@ -187,8 +187,8 @@ interference.
 </p>
 
 **Figure 9.** Discrete energy of the clamped membrane. With no external
-drive the relative drift stays small, consistent with the 2D CFL-stable
-leapfrog scheme.
+drive the relative drift stays near $10^{-2}$, consistent with the 2D
+CFL-stable leapfrog scheme on a localized strike.
 
 ---
 
