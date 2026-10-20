@@ -55,7 +55,7 @@ def generate_all_figures(
 
 
 def _save(fig: plt.Figure, path: Path) -> Path:
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.25)
     plt.close(fig)
     return path
 
@@ -131,16 +131,19 @@ def _fig_string_evolution(sol: StringSolution, out: Path) -> Path:
     fractions = (0.0, 0.25, 0.5, 0.75, 1.0)
     idxs = sol.snapshot_indices(fractions)
     colors = [PALETTE["cool"], PALETTE["accent"], PALETTE["accent_soft"], PALETTE["warm"], PALETTE["ink"]]
-    fig, ax = plt.subplots(figsize=(9.5, 4.0))
+    fig, ax = plt.subplots(figsize=(9.5, 4.4))
     for frac, idx, color in zip(fractions, idxs, colors):
         label = rf"$t/T_1 = {frac:.2f}$" if frac else r"$t = 0$"
         ax.plot(sol.x, sol.u[idx], color=color, lw=2.0 if frac in (0.0, 1.0) else 1.6, label=label)
     ax.axhline(0.0, color=PALETTE["grid"], lw=1)
     ax.set_xlabel(r"$x$ [m]")
     ax.set_ylabel(r"$u(x,t)$ [m]")
-    ax.set_title("Fixed ends: the pluck splits, reflects, and reforms after one period")
+    ax.set_title(
+        "Fixed ends: the pluck splits, reflects, and reforms after one period",
+        pad=14,
+    )
     ax.legend(ncol=3, fontsize=9, loc="upper right")
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.96))
     return _save(fig, out / "03_string_fixed_evolution.png")
 
 

@@ -19,7 +19,7 @@ from wavefd.viz.style import PALETTE, apply_style
 
 
 def _save(fig: plt.Figure, path: Path) -> Path:
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.25)
     plt.close(fig)
     return path
 

@@ -39,19 +39,20 @@ def animate_string_gif(
     pad = 0.08 * max(ymax - ymin, 1e-12)
     T1 = sol.config.fundamental_period(float(sol.x[-1] - sol.x[0]))
 
-    fig, ax = plt.subplots(figsize=(8.0, 3.6))
+    # Extra top margin so animated titles are not clipped by the axes frame
+    # (PillowWriter ignores bbox_inches='tight').
+    fig, ax = plt.subplots(figsize=(8.0, 4.6))
     (line,) = ax.plot([], [], color=PALETTE["accent"], lw=2.2)
     ax.axhline(0.0, color=PALETTE["grid"], lw=1)
     ax.set_xlim(sol.x[0], sol.x[-1])
     ax.set_ylim(ymin - pad, ymax + pad)
     ax.set_xlabel(r"$x$ [m]")
     ax.set_ylabel(r"$u(x,t)$ [m]")
-    title = ax.set_title("")
-    fig.tight_layout()
+    title = ax.set_title("Fixed string", pad=18)
+    fig.subplots_adjust(left=0.11, right=0.98, bottom=0.13, top=0.78)
 
     def _init():
         line.set_data([], [])
-        title.set_text("")
         return line, title
 
     def _update(frame: int):
@@ -100,7 +101,7 @@ def animate_membrane_gif(
     extent = [sol.x[0], sol.x[-1], sol.y[0], sol.y[-1]]
     T11 = sol.config.fundamental_period()
 
-    fig, ax = plt.subplots(figsize=(5.2, 5.0))
+    fig, ax = plt.subplots(figsize=(5.4, 5.8))
     im = ax.imshow(
         sol.u[0],
         origin="lower",
@@ -112,10 +113,10 @@ def animate_membrane_gif(
     )
     ax.set_xlabel(r"$x$ [m]")
     ax.set_ylabel(r"$y$ [m]")
-    title = ax.set_title("")
+    title = ax.set_title(label, pad=18)
     cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     cbar.set_label(r"$u$ [m]")
-    fig.tight_layout()
+    fig.subplots_adjust(left=0.14, right=0.86, bottom=0.10, top=0.82)
 
     def _update(frame: int):
         i = int(idxs[frame])

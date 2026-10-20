@@ -100,7 +100,7 @@ reflect with a sign change and reform the initial profile at $t=T_1$.
 </p>
 
 **Figure 3b.** Discrete snapshots of the same evolution at
-$t/T_1\in\{0,0.25,0.5,0.75,1\}$.
+$t/T_1 = 0$, $0.25$, $0.5$, $0.75$, and $1$.
 
 <p align="center">
   <img src="figures/04_string_spacetime.png" width="820" alt="Space-time diagram of the fixed string"/>
@@ -219,8 +219,8 @@ norm) as a function of time.
 
 A pure standing wave $u(x,0)=A\sin(\pi x/L)$ removes the kink and yields a
 clean convergence test. Refining $\Delta x$ at fixed Courant number, the
-leapfrog scheme (formally $\mathcal{O}(\Delta x^2,\Delta t^2)$) shows a
-higher observed rate on this grid eigenmode:
+leapfrog scheme — formally second-order in $\Delta x$ and $\Delta t$ —
+shows a higher observed rate on this grid eigenmode:
 
 <p align="center">
   <img src="figures/10_convergence.png" width="720" alt="Spatial convergence study"/>
@@ -288,8 +288,8 @@ $(m,n)$ pairs carry the energy:
   <img src="figures/15_membrane_modes.png" width="900" alt="Membrane rectangular modal spectrum"/>
 </p>
 
-**Figure 15.** Absolute modal amplitudes $|a_{mn}|$ and energy fractions
-for the centered strike.
+**Figure 15.** Absolute modal amplitudes $\lvert a_{mn}\rvert$ and energy
+fractions for the centered strike.
 
 ---
 
