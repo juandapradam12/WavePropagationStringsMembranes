@@ -27,7 +27,7 @@ Wave speed $c=250\,\mathrm{m\,s^{-1}}$ in both cases. For the string the
 fundamental period is exact,
 
 $$
-T_1 = \frac{2L}{c},
+T_1 = \frac{2L}{c}
 $$
 
 while the membrane's lowest rectangular mode has period
@@ -147,8 +147,7 @@ The same initial pluck is now evolved with the right endpoint prescribed
 as a sinusoid at the fundamental frequency,
 
 $$
-u(L,t)=A\sin\Bigl(\frac{\pi c}{L}\,t\Bigr),
-\qquad u(0,t)=0.
+u(L,t)=A\sin\Bigl(\frac{\pi c}{L}\,t\Bigr), \qquad u(0,t)=0.
 $$
 
 The drive resonates with the lowest mode and continuously injects energy
@@ -203,7 +202,7 @@ With vanishing initial velocity the fixed-end problem has the d'Alembert
 representation
 
 $$
-u(x,t)=\frac12\bigl[F(x-ct)+F(x+ct)\bigr],
+u(x,t)=\frac12\bigl[F(x-ct)+F(x+ct)\bigr]
 $$
 
 where $F$ is the odd $2L$-periodic extension of the initial pluck. Comparing
@@ -313,7 +312,7 @@ Linear viscous friction $-\gamma\partial_t u$ turns the conservative string
 into a decaying oscillator,
 
 $$
-\partial_{tt} u = c^2 \partial_{xx} u - \gamma \partial_t u,
+\partial_{tt} u = c^2 \partial_{xx} u - \gamma \partial_t u
 $$
 
 and drains mechanical energy on a controllable timescale:
@@ -344,7 +343,7 @@ A free drumhead is not a membrane without boundaries. On a finite square
 the free-edge condition is Neumann,
 
 $$
-\partial_n u = 0 \quad\text{on}\quad \partial\Omega,
+\partial_n u = 0 \quad\text{on}\quad \partial\Omega
 $$
 
 implemented with reflected ghost points on all four sides. The same
@@ -367,7 +366,7 @@ zero on the boundary.
 ($u=0$) and free ($\partial_n u=0$) edges.
 
 Free rectangular modes are cosines,
-$A\cos(\omega_{mn}t)\cos(m\pi x/L)\cos(n\pi y/L)$ with $m,n\ge 0$. A pure
+$A\cos(\omega_{mn}t)\cos(m\pi x/L)\cos(n\pi y/L)$ with $m\ge 0$, $n\ge 0$. A pure
 $(1,0)$ field checks the Neumann leapfrog against that closed form:
 
 <p align="center">

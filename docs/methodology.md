@@ -9,8 +9,7 @@ the README, not to replace them.
 ### Vibrating string (1D)
 
 $$
-\partial_{tt} u = c^2 \partial_{xx} u,
-\qquad x \in (0,L),\ t > 0,
+\partial_{tt} u = c^2 \partial_{xx} u, \qquad x \in (0,L),\ t > 0
 $$
 
 with initial data $u(x,0)=u_0(x)$, $\partial_t u(x,0)=0$. Two boundary
@@ -25,9 +24,7 @@ regimes are considered:
 Optional linear damping $-\gamma\partial_t u$ uses the centered update
 
 $$
-u^{n+1}_i
-=
-\frac{2u^n_i-(1-\gamma\Delta t/2)u^{n-1}_i+r^2\Delta_h u^n_i}{1+\gamma\Delta t/2}.
+u^{n+1}_i = \frac{2u^n_i - (1 - \gamma\Delta t/2)\,u^{n-1}_i + r^2\Delta_h u^n_i}{1 + \gamma\Delta t/2}
 $$
 
 The exact fundamental period for fixed ends is $T_1 = 2L/c$.
@@ -35,37 +32,36 @@ The exact fundamental period for fixed ends is $T_1 = 2L/c$.
 ### Clamped membrane (2D)
 
 $$
-\partial_{tt} u = c^2 \nabla^2 u,
-\qquad (x,y)\in(0,L)^2,\ t>0,
+\partial_{tt} u = c^2 \nabla^2 u, \qquad (x,y)\in(0,L)^2,\ t>0
 $$
 
-with either clamped edges $u|_{\partial\Omega}=0$ or free edges
-$\partial_n u|_{\partial\Omega}=0$, and vanishing initial velocity.
+with either clamped edges ($u=0$ on $\partial\Omega$) or free edges
+($\partial_n u=0$ on $\partial\Omega$), and vanishing initial velocity.
 Rectangular frequencies keep the form
 
 $$
-f_{mn} = \frac{c}{2}\sqrt{\Bigl(\frac{m}{L}\Bigr)^2+\Bigl(\frac{n}{L}\Bigr)^2},
+f_{mn} = \frac{c}{2}\sqrt{\Bigl(\frac{m}{L}\Bigr)^2 + \Bigl(\frac{n}{L}\Bigr)^2}
 $$
 
-with sine factors and $m,n\ge 1$ when clamped, and cosine factors and
-$m,n\ge 0$ when free (the rigid mode $(0,0)$ has $f_{00}=0$). Neumann
+with sine factors and $m\ge 1$, $n\ge 1$ when clamped, and cosine factors and
+$m\ge 0$, $n\ge 0$ when free (the rigid mode $(0,0)$ has $f_{00}=0$). Neumann
 conditions are imposed by reflecting ghost points across each edge.
 
 ## Explicit finite-difference schemes
 
 Uniform grids $\Delta x$ (and $\Delta y=\Delta x$ in 2D) and time step
-$\Delta t$ define the Courant number $r = c\,\Delta t/\Delta x$.
+$\Delta t$ define the Courant number $r = c\Delta t/\Delta x$.
 
 ### 1D leapfrog update
 
 $$
-u^{n+1}_i = 2(1-r^2)\,u^n_i - u^{n-1}_i + r^2\bigl(u^n_{i+1}+u^n_{i-1}\bigr).
+u^{n+1}_i = 2(1-r^2)\,u^n_i - u^{n-1}_i + r^2\bigl(u^n_{i+1}+u^n_{i-1}\bigr)
 $$
 
 The first step from rest uses the centered starter
 
 $$
-u^{1}_i = u^{0}_i + \tfrac12 r^2\bigl(u^{0}_{i+1}-2u^{0}_i+u^{0}_{i-1}\bigr).
+u^{1}_i = u^{0}_i + \tfrac{1}{2} r^2\bigl(u^{0}_{i+1} - 2u^{0}_i + u^{0}_{i-1}\bigr)
 $$
 
 Von Neumann analysis yields stability for $r\le 1$.
@@ -88,8 +84,8 @@ $$
 
 (and its two-dimensional analogue) is monitored at every time step. For
 closed systems (fixed boundaries, no drive) the relative drift
-$\max|E^n-E^0|/|E^0|$ is the primary consistency diagnostic reported in the
-figures.
+$\max\lvert E^n - E^0\rvert / \lvert E^0\rvert$ is the primary consistency
+diagnostic reported in the figures.
 
 ## Exact references
 
@@ -97,7 +93,7 @@ With $\partial_t u(x,0)=0$ the fixed-end solution is given by d'Alembert's
 formula on the odd $2L$-periodic extension $F$ of the initial data:
 
 $$
-u(x,t)=\frac12\bigl[F(x-ct)+F(x+ct)\bigr].
+u(x,t)=\frac{1}{2}\bigl[F(x-ct)+F(x+ct)\bigr]
 $$
 
 A triangular pluck of height $A$ peaking at mid-span has sine coefficients
